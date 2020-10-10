@@ -1,6 +1,6 @@
 # Fireworks
-Creating interactive page using Processing 
+Created interactive webpage using Processing. 
 
-↓You can access to the page
+↓You can access to the page↓
 
 [https://arco0922.github.io/Fireworks/](https://arco0922.github.io/Fireworks/)
