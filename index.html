@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Fireworks</title>
+<script src="./dependencies/processing.min.js"></script>
+<style type="text/css">
+body{
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+}
+
+body #wrapper{
+	width: 100%;
+	height: 100%;
+	position: fixed;
+}
+
+@font-face {
+  font-family: "sample1";
+  src:url("./Planetarium.otf") format("opentype");
+}
+
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  color: white;
+  font-family: "sample1";
+  font-size: 24px;
+  margin-top: -50px;
+  margin-left: -220px;
+}
+
+*:focus{
+  outline:none;
+}
+
+</style>
+
+<script type="application/processing" data-processing-target="pjs" >
+ArrayList<Seed> seeds = new ArrayList<Seed>();
+float mX;
+float mY;
+int s;
+int h;
+
+void setup() {
+	size(innerWidth,innerHeight,P2D);
+	frameRate(60);
+	background(0);
+	colorMode(HSB,360,100,150,100);
+}
+
+void draw() {
+	//size(innerWidth,innerHeight,P2D);
+	fill(0,10);
+	rect(0,0,width,height);
+	s = seeds.size();
+	for (int i = 0; i < s; i++) {
+		seeds.get(i).draw();
+	}
+}
+void mouseClicked() {
+	mX = mouseX;
+	mY = mouseY;
+	h = (int)(random(1.0) * 360);
+	seeds.add(new Seed(mX,mY,h));
+}
+
+class Seed {
+	float noiseScale = 0.2f;
+	float u;
+	float n;
+	int i;
+	int j;
+	float x;
+	float y;
+	float nx;
+	float ny;
+	float ix;
+	float iy;
+	float deltaY;
+	Flower flower;
+	int h;
+
+	Seed(float mX, float mY, int hu) {
+		ix = mX;
+		iy = mY;
+		x = mX;
+		y = height;
+		nx = mX;
+		ny = height;
+		i = 0;
+		j = 0;
+		h = hu;
+	}
+
+	void draw() {
+		ny -= 13*(deltaY+0.07);
+		if (ny > iy+5) {
+			deltaY = (float)(Math.sqrt(ny - iy)/Math.sqrt(height));			
+			i++;
+			n = (noise(noiseScale*i)*50-25)*deltaY;
+			nx = ix + n;		
+			noFill();
+			stroke(255);
+			strokeWeight(12.0*((float)(Math.sqrt((height - iy))/Math.sqrt(height))));
+			line(x,y,nx,ny);
+			x = nx;	
+			y = ny;
+		}
+		else {
+			j++;
+			if (j==15) {
+				flower = new Flower(ix,iy,h); 
+			}
+			if (j>15) {
+				flower.draw();
+			}
+		}
+	}
+}
+class Flower {
+	int NUM = 1000;
+	int INUM = 500;
+	ParticleVec2[] particles = new ParticleVec2[NUM];
+	ParticleVec2[] iparticles = new ParticleVec2[INUM];
+	int h;
+	float r;
+
+	Flower(float ix, float iy, int hu) {
+		h = hu;
+		r = 4.5*((float)(Math.sqrt((height - iy))/Math.sqrt(height)));
+		for (int i=0; i<NUM; i++) {
+			particles[i] = new ParticleVec2(46,30,r);
+			particles[i].location.set(ix,iy);
+			float angle = random(PI*2.0);
+			float length = random(4.0*(1-(1.0*iy/height)),10.0*(1-(1.0*iy/height)));
+			float posX = cos(angle) * length;
+			float posY = sin(angle) * length;
+			particles[i].velocity.set(posX,posY);
+			particles[i].acceleration.set(0.0,0.02);
+		}
+		for (int i=0; i<INUM; i++) {
+			iparticles[i] = new ParticleVec2(h,60,r);
+			iparticles[i].location.set(ix,iy);
+			float angle = random(PI*2.0);
+			float length = random(5.0*(1-(1.0*iy/height)));
+			float posX = cos(angle) * length;
+			float posY = sin(angle) * length;
+			iparticles[i].velocity.set(posX,posY);
+			iparticles[i].acceleration.set(0.0,0.02);
+		}
+	}
+
+	void draw() {
+		for (int i=0; i<NUM; i++) {
+			particles[i].update();
+			particles[i].draw();
+		}
+		for (int i=0; i<INUM; i++) {
+			iparticles[i].update();
+			iparticles[i].draw();
+		}
+	}
+}
+
+class ParticleVec2 {
+	PVector location;
+	PVector velocity;
+	PVector acceleration;
+	float radius;
+	int h; //色相
+	int s; //彩度
+	int b; //明度
+
+
+	ParticleVec2(int hu, int sa, float ra) {
+		radius = ra;
+		location = new PVector(0.0,0.0);
+		velocity = new PVector(0.0,0.0);
+		acceleration = new PVector(0.0,0.0);
+		h = hu;
+		s = sa;
+		b = 150;
+	}
+
+	void update() {
+		velocity.add(acceleration);
+		velocity.mult(0.98);
+		location.add(velocity);
+	}
+
+	void draw() {
+		b -= 1;
+		if (b>0) {
+			fill(h,s,b);
+			noStroke();
+			ellipse(location.x, location.y, radius, radius);
+		}
+	}
+}
+
+</script>
+</head>
+
+<body>
+<div id="wrapper">
+<canvas id="pjs"/><br />
+</div>
+
+<div class="centered">
+<h1>
+Fireworks
+</h1>
+</div>
+</body>
+
+</html>
