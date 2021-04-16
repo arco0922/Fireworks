@@ -1,6 +1,6 @@
 var seeds = [];
 var particles = [];
-var MAX_SEEDS = 7;
+var MAX_SEEDS = 5;
 
 function setup() {
 	var cnv = createCanvas(innerWidth,innerHeight,P2D);
