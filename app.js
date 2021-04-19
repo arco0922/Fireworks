@@ -29,7 +29,7 @@ function draw() {
 	
 }
 
-function mouseClicked() {
+function touchEnded() {
 	var unfinished = seeds.filter(seed=>!seed.finished);
 	if (unfinished.length<MAX_SEEDS) {
 		var h = int(random(1.0)*360);
